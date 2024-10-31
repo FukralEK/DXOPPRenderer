@@ -1,0 +1,7 @@
+*.exe
+*.pdb
+build/
+.vscode/
+.vs/
+out/
+s
