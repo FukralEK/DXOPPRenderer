@@ -52,9 +52,9 @@ void App::run()
 
 	Vertex *verticies = new Vertex[verticiesObj.size()];
 
-	float r = 1.0f;
-	float g = 0.95f;
-	float b = 0.75f;
+	float r = 0.0f;
+	float g = 1.0f;
+	float b = 0.0f;
 
 	for (int i = 0; i < verticiesObj.size(); i++)
 	{
@@ -98,13 +98,13 @@ void App::run()
 
 	camView = DirectX::XMMatrixLookAtLH(camPosition, camTarget, camUp);
 
-	camProjection = DirectX::XMMatrixPerspectiveFovLH(DirectX::XMConvertToRadians(90.0f), (float)window.getRes()[0] / (float)window.getRes()[1], 0.01f, 1000.0f);
+	camProjection = DirectX::XMMatrixPerspectiveFovLH(DirectX::XMConvertToRadians(120.0f), (float)window.getRes()[0] / (float)window.getRes()[1], 0.01f, 1000.0f);
 
 	World = DirectX::XMMatrixIdentity();
 
 	WVP = World * camView * camProjection;
 
-	cBuffer cb = {WVP, 0.0f, 0.0f, 0.0f, 0.0f};
+	cBuffer cb = {WVP, 0.0f, 0.0f, 2.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
 
 	cb.wvp = DirectX::XMMatrixTranspose(WVP);
 	while (running)
