@@ -19,6 +19,8 @@ struct cBuffer
 	float rx, ry, rz, rw;
 };
 
+bool spinning = false;
+
 void App::run()
 {
 	Window window(WIDTH, HEIGHT, "Hello, Triangle");
@@ -118,7 +120,13 @@ void App::run()
 		ImGui::Begin("DX Playground");
 		ImGui::InputFloat3("Mesh Position", &cb.x);
 		ImGui::InputFloat3("Mesh Rotation", &cb.rx);
+		ImGui::Checkbox("Spinning", &spinning);
 		ImGui::End();
+
+		if (spinning)
+		{
+			cb.ry += 0.05;
+		}
 
 		ImGui::Render();
 
