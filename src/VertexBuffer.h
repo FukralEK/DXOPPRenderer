@@ -11,17 +11,18 @@ struct Vertex
 class VertexBuffer
 {
 private:
-	ID3D11Buffer* vertexBuffer = nullptr;
-	ID3D11InputLayout* inputLayout = nullptr;
-	
+	ID3D11Buffer *vertexBuffer = nullptr;
+	ID3D11InputLayout *inputLayout = nullptr;
+
 	UINT stride = sizeof(Vertex);
 	UINT offset = 0;
 
+	int count;
+
 public:
 	void use();
-	void createLayout(Shader& shader);
-	void createBuffer(Vertex* vertices, size_t size);
+	void createLayout(Shader &shader);
+	void createBuffer(Vertex *vertices, size_t size);
 
 	void release();
 };
-
