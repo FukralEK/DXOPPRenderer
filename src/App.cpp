@@ -8,6 +8,7 @@
 #include "imgui.h"
 #include "imgui_impl_dx11.h"
 #include "imgui_impl_win32.h"
+#include "OBJ_Loader.h"
 
 const int WIDTH = 1280, HEIGHT = 720;
 
@@ -15,6 +16,7 @@ struct cBuffer
 {
 	DirectX::XMMATRIX wvp;
 	float x, y, z, w;
+	float rx, ry, rz, rw;
 };
 
 void App::run()
@@ -43,48 +45,37 @@ void App::run()
 
 	vertexBuffer.createLayout(shader);
 
-	Vertex vertices[] = {
-		// Front face
-		Vertex(-0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 1.0f), // 0
-		Vertex(-0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f),	// 1
-		Vertex(0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f),	// 2
-		Vertex(0.5f, -0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f),	// 3
+	objl::Loader loader;
+	loader.LoadFile("C:\\Users\\Fabian\\Documents\\monkey.obj");
 
-		// Back face
-		Vertex(-0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 1.0f, 1.0f), // 4
-		Vertex(-0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 1.0f, 1.0f),	 // 5
-		Vertex(0.5f, 0.5f, -0.5f, 1.0f, 1.0f, 0.0f, 1.0f),	 // 6
-		Vertex(0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 1.0f, 1.0f),	 // 7
-	};
+	auto verticiesObj = loader.LoadedVertices;
 
-	DWORD indices[] = {
-		// Front face
-		0, 2, 1,
-		0, 3, 2,
+	Vertex *verticies = new Vertex[verticiesObj.size()];
 
-		// Back face
-		4, 5, 6,
-		4, 6, 7,
+	float r = 1.0f;
+	float g = 0.95f;
+	float b = 0.75f;
 
-		// Left face
-		4, 1, 5,
-		4, 0, 1,
+	for (int i = 0; i < verticiesObj.size(); i++)
+	{
+		r = g;
+		g = b;
+		b = r;
+		verticies[i] = {verticiesObj[i].Position.X, verticiesObj[i].Position.Y, verticiesObj[i].Position.Z, r, g, b, 1.0f};
+	}
 
-		// Right face
-		3, 6, 2,
-		3, 7, 6,
+	auto indicesObj = loader.LoadedIndices;
 
-		// Top face
-		1, 6, 5,
-		1, 2, 6,
+	DWORD *indices = new DWORD[indicesObj.size()];
 
-		// Bottom face
-		0, 7, 3,
-		0, 4, 7};
+	for (int i = 0; i < indicesObj.size(); i++)
+	{
+		indices[i] = (DWORD)indicesObj[i];
+	}
 
-	vertexBuffer.createBuffer(vertices, sizeof(vertices));
+	vertexBuffer.createBuffer(verticies, sizeof(Vertex) * verticiesObj.size());
 
-	indexBuffer.createBuffer(indices, sizeof(indices));
+	indexBuffer.createBuffer(indices, sizeof(DWORD) * indicesObj.size());
 
 	ConstantBuffer constantBuffer;
 
@@ -125,8 +116,8 @@ void App::run()
 		ImGui::NewFrame();
 
 		ImGui::Begin("DX Playground");
-		ImGui::Text("Position");
-		ImGui::InputFloat3("Cube Position", &cb.x);
+		ImGui::InputFloat3("Mesh Position", &cb.x);
+		ImGui::InputFloat3("Mesh Rotation", &cb.rx);
 		ImGui::End();
 
 		ImGui::Render();
@@ -144,6 +135,9 @@ void App::run()
 		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 		renderer.update();
 	}
+
+	delete indices;
+	delete verticies;
 
 	constantBuffer.release();
 
