@@ -4,6 +4,7 @@
 #include "Triangle.h"
 #include "IndexBuffer.h"
 #include <DirectXMath.h>
+#include "ConstantBuffer.h"
 
 const int WIDTH = 1280, HEIGHT = 720;
 
@@ -45,6 +46,7 @@ void App::run()
 		shader.use();
 		vertexBuffer.use();
 		indexBuffer.use();
+
 		DXShit::context->DrawIndexed(indexBuffer.getCount(), 0, 0);
 
 		window.update(running);

@@ -8,11 +8,12 @@ private:
 	Window &window;
 
 private:
-	IDXGISwapChain* swapChain = nullptr;
-	ID3D11Device* device = nullptr;
-	ID3D11DeviceContext* context = nullptr;
-	ID3D11RenderTargetView* renderTargetView = nullptr;
-
+	IDXGISwapChain *swapChain = nullptr;
+	ID3D11Device *device = nullptr;
+	ID3D11DeviceContext *context = nullptr;
+	ID3D11RenderTargetView *renderTargetView = nullptr;
+	ID3D11DepthStencilView *depthStencilView = nullptr;
+	ID3D11Texture2D *depthStencilBuffer = nullptr;
 
 public:
 	Renderer(Window &window);
@@ -20,9 +21,8 @@ public:
 	void release();
 	void update();
 
-	IDXGISwapChain* getSwapChain();
-	ID3D11Device* getDevice();
-	ID3D11DeviceContext* getContext();
-	ID3D11RenderTargetView* getRenderTargetView();
+	IDXGISwapChain *getSwapChain();
+	ID3D11Device *getDevice();
+	ID3D11DeviceContext *getContext();
+	ID3D11RenderTargetView *getRenderTargetView();
 };
-
