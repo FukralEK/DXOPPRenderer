@@ -41,12 +41,12 @@ void App::run()
 	VertexBuffer vertexBuffer;
 	IndexBuffer indexBuffer;
 
-	shader.LoadFromFile("C:\\Users\\Fabian\\Documents\\DXOPPRenderer\\src\\VertexShader.hlsl", "C:\\Users\\Fabian\\Documents\\DXOPPRenderer\\src\\PixelShader.hlsl");
+	shader.LoadFromFile("src/VertexShader.hlsl", "src/PixelShader.hlsl");
 
 	vertexBuffer.createLayout(shader);
 
 	objl::Loader loader;
-	loader.LoadFile("C:\\Users\\Fabian\\Documents\\monkey.obj");
+	loader.LoadFile("monkey.obj");
 
 	auto verticiesObj = loader.LoadedVertices;
 
