@@ -8,6 +8,11 @@
 
 const int WIDTH = 1280, HEIGHT = 720;
 
+struct cBuffer
+{
+	float x, y, z, w;
+};
+
 void App::run()
 {
 	Window window(WIDTH, HEIGHT, "Hello, Triangle");
@@ -41,17 +46,50 @@ void App::run()
 
 	indexBuffer.createBuffer(indices, sizeof(indices));
 
+	ConstantBuffer constantBuffer;
+
+	constantBuffer.createBuffer(sizeof(cBuffer));
+
+	cBuffer cb = {1.0f, 1.0f, 1.0f, 1.0f};
+
+	bool invert = false;
+
 	while (running)
 	{
 		shader.use();
 		vertexBuffer.use();
 		indexBuffer.use();
 
+		constantBuffer.use();
+
+		if (!invert)
+		{
+			cb.x += 0.015f;
+			cb.y -= 0.015f;
+		}
+		else
+		{
+			cb.x -= 0.015f;
+			cb.y += 0.015f;
+		}
+
+		if (cb.y < 0.0f)
+		{
+			invert = true;
+		}
+		if (cb.x < 0.0f)
+		{
+			invert = false;
+		}
+
+		constantBuffer.update(&cb, sizeof(cb));
 		DXShit::context->DrawIndexed(indexBuffer.getCount(), 0, 0);
 
 		window.update(running);
 		renderer.update();
 	}
+
+	constantBuffer.release();
 
 	indexBuffer.release();
 	shader.release();

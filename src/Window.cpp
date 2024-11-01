@@ -3,7 +3,8 @@
 
 LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-	switch (message) {
+	switch (message)
+	{
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		return 0;
@@ -23,6 +24,8 @@ void Window::init()
 	wc.lpszClassName = L"TheWindowsWindow";
 	wc.style = CS_HREDRAW | CS_VREDRAW;
 	wc.cbSize = sizeof(WNDCLASSEX);
+	wc.hCursor = LoadCursor(NULL, IDC_ARROW);
+	wc.hbrBackground = (HBRUSH)(COLOR_WINDOW + 2);
 	RegisterClassEx(&wc);
 
 	hwnd = CreateWindowEx(0, L"TheWindowsWindow", L"DX11 Triangle", WS_OVERLAPPEDWINDOW, 100, 100, 1280, 720, NULL, NULL, WinMainShit::hInstance, NULL);
@@ -33,7 +36,7 @@ void Window::release()
 {
 }
 
-void Window::update(bool& running)
+void Window::update(bool &running)
 {
 	MSG msg = {};
 
