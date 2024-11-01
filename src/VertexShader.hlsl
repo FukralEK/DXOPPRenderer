@@ -1,8 +1,8 @@
 cbuffer cbPerObject
 {
-    float4 Tester;
+    matrix wvpMatrix;
+    float4 position;
 };
-
 
 struct VS_OUTPUT
 {
@@ -14,7 +14,10 @@ VS_OUTPUT main(float4 inPos : POSITION, float4 inColor : COLOR)
 {
     VS_OUTPUT output;
 
-    output.Pos = float4(inPos.x * Tester.x, inPos.y *Tester.y, inPos.z * Tester.z, inPos.w);
+    float4 finalPos = inPos + position;
+
+    output.Pos = mul(finalPos, wvpMatrix);
+
     output.Color = inColor;
 
     return output;

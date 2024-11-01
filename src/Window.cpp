@@ -1,8 +1,15 @@
 #include "Window.h"
 #include "common.h"
+#include "imgui.h"
+#include "imgui_impl_dx11.h"
+#include "imgui_impl_win32.h"
+
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
+	if (ImGui_ImplWin32_WndProcHandler(hWnd, message, wParam, lParam))
+		return true;
 	switch (message)
 	{
 	case WM_DESTROY:
@@ -28,7 +35,7 @@ void Window::init()
 	wc.hbrBackground = (HBRUSH)(COLOR_WINDOW + 2);
 	RegisterClassEx(&wc);
 
-	hwnd = CreateWindowEx(0, L"TheWindowsWindow", L"DX11 Triangle", WS_OVERLAPPEDWINDOW, 100, 100, 1280, 720, NULL, NULL, WinMainShit::hInstance, NULL);
+	hwnd = CreateWindowEx(0, L"TheWindowsWindow", L"DX11", WS_OVERLAPPEDWINDOW, 100, 100, 1280, 720, NULL, NULL, WinMainShit::hInstance, NULL);
 	ShowWindow(hwnd, WinMainShit::nCmdShow);
 }
 
