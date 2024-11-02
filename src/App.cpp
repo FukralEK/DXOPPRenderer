@@ -8,23 +8,11 @@
 #include "imgui.h"
 #include "imgui_impl_dx11.h"
 #include "imgui_impl_win32.h"
-#include "OBJ_Loader.h"
 #include "Camera.h"
+#include "Mesh.h"
 
-const int WIDTH = 1280, HEIGHT = 720;
-
-struct Vertex
-{
-	float x, y, z;
-	float r, g, b, a;
-};
-
-struct cBuffer
-{
-	DirectX::XMMATRIX wvp;
-	float x, y, z, w;
-	float rx, ry, rz, rw;
-};
+const int WIDTH = 1280,
+		  HEIGHT = 720;
 
 bool spinning = true;
 
@@ -46,53 +34,9 @@ void App::run()
 	ImGui_ImplWin32_Init(window.getHwnd());
 	ImGui_ImplDX11_Init(DXShit::device, DXShit::context);
 
-	Shader shader;
-	VertexBuffer vertexBuffer;
-	IndexBuffer indexBuffer;
-
-	shader.LoadFromFile("src/VertexShader.hlsl", "src/PixelShader.hlsl");
-
-	vertexBuffer.createLayout(shader, sizeof(float) * 7);
-
-	objl::Loader loader;
-	loader.LoadFile("monkey.obj");
-
-	auto verticiesObj = loader.LoadedVertices;
-
-	Vertex *verticies = new Vertex[verticiesObj.size()];
-
-	float r = 0.0f;
-	float g = 1.0f;
-	float b = 0.0f;
-
-	for (int i = 0; i < verticiesObj.size(); i++)
-	{
-		r = g;
-		g = b;
-		b = r;
-		verticies[i] = {verticiesObj[i].Position.X, verticiesObj[i].Position.Y, verticiesObj[i].Position.Z, r, g, b, 1.0f};
-	}
-
-	auto indicesObj = loader.LoadedIndices;
-
-	DWORD *indices = new DWORD[indicesObj.size()];
-
-	for (int i = 0; i < indicesObj.size(); i++)
-	{
-		indices[i] = (DWORD)indicesObj[i];
-	}
-
-	vertexBuffer.createBuffer(verticies, sizeof(Vertex) * verticiesObj.size());
-
-	indexBuffer.createBuffer(indices, sizeof(DWORD) * indicesObj.size());
-
-	ConstantBuffer constantBuffer;
-
-	constantBuffer.createBuffer(sizeof(cBuffer));
-
 	bool invert = false;
 
-	Camera &camera = camera.getInstance();
+	Camera &camera = Camera::getInstance();
 
 	float fov = 120.0f;
 
@@ -100,10 +44,13 @@ void App::run()
 
 	camera.setProjection(fov, (float)window.getRes()[0] / (float)window.getRes()[1], 0.01f, 1000.0f);
 
-	cBuffer cb = {camera.getWVP(), 0.0f, 0.0f, 2.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
-
 	std::string fileName;
 	fileName.resize(255);
+
+	Mesh mesh;
+
+	mesh.position = {0.0f, 0.0f, 1.0f};
+	mesh.rotation = {0.0f, 0.0f, 0.0f};
 
 	while (running)
 	{
@@ -115,13 +62,18 @@ void App::run()
 
 		ImGui::Begin("DX Playground");
 		ImGui::SliderFloat("FOV", &fov, 10.0f, 180.0f);
-		ImGui::InputFloat3("Mesh Position", &cb.x);
-		ImGui::InputFloat3("Mesh Rotation", &cb.rx);
+		ImGui::InputFloat3("Mesh Position", &mesh.position.x);
+		ImGui::InputFloat3("Mesh Rotation", &mesh.rotation.x);
 		ImGui::Checkbox("Spinning", &spinning);
 		ImGui::InputText("Model File", &fileName[0], fileName.size());
 
-		if (ImGui::Button("Load Model"))
+		if (ImGui::Button("Load Model") && fileName != "")
 		{
+			if (mesh.isLoaded())
+			{
+				mesh.release();
+			}
+			mesh.init(fileName);
 			fileName = "";
 			fileName.resize(255);
 		}
@@ -129,37 +81,24 @@ void App::run()
 
 		camera.setProjection(fov, (float)window.getRes()[0] / (float)window.getRes()[1], 0.01f, 1000.0f);
 
-		cb.wvp = camera.getWVP();
+		ImGui::Render();
 
 		if (spinning)
 		{
-			cb.ry += 0.05;
+			mesh.rotation.y += 0.05;
 		}
 
-		ImGui::Render();
-
-		shader.use();
-		vertexBuffer.use();
-		indexBuffer.use();
-
-		constantBuffer.use();
-
-		constantBuffer.update(&cb, sizeof(cb));
-		DXShit::context->DrawIndexed(indexBuffer.getCount(), 0, 0);
+		mesh.draw();
 
 		window.update(running);
 		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 		renderer.update();
 	}
 
-	delete indices;
-	delete verticies;
-
-	constantBuffer.release();
-
-	indexBuffer.release();
-	shader.release();
-	vertexBuffer.release();
+	if (mesh.isLoaded())
+	{
+		mesh.release();
+	}
 
 	ImGui_ImplDX11_Shutdown();
 	ImGui_ImplWin32_Shutdown();
