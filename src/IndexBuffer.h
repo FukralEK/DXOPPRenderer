@@ -4,12 +4,12 @@
 class IndexBuffer
 {
 private:
-    int count;
+    size_t count;
     ID3D11Buffer *indexBuffer;
 
 public:
     void createBuffer(DWORD *indices, size_t size);
     void release();
     void use();
-    int getCount();
+    size_t getCount();
 };

@@ -20,6 +20,8 @@ private:
     float farZ;
 
 public:
+    int faces = 0;
+
     static Camera &getInstance()
     {
         static Camera instance;

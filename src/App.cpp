@@ -61,6 +61,7 @@ void App::run()
 		ImGui::NewFrame();
 
 		ImGui::Begin("DX Playground");
+		ImGui::Text("Faces: %d", camera.faces);
 		ImGui::SliderFloat("FOV", &fov, 10.0f, 180.0f);
 		ImGui::SliderFloat3("Background Color", camera.color, 0.0f, 1.0f);
 
@@ -91,6 +92,7 @@ void App::run()
 
 		ImGui::Render();
 
+		camera.faces = 0;
 		for (auto &mesh : meshes)
 		{
 			mesh.draw();

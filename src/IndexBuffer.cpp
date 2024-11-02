@@ -30,7 +30,7 @@ void IndexBuffer::use()
     DXShit::context->IASetIndexBuffer(indexBuffer, DXGI_FORMAT_R32_UINT, 0);
 }
 
-int IndexBuffer::getCount()
+size_t IndexBuffer::getCount()
 {
     return count;
 }

@@ -87,6 +87,8 @@ void Mesh::draw()
     constantBuffer.update(&cb, sizeof(cb));
 
     DXShit::context->DrawIndexed(indexBuffer.getCount(), 0, 0);
+
+    camera.faces += indexBuffer.getCount() / 3;
 }
 
 void Mesh::release()
