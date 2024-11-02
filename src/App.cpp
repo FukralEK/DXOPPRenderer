@@ -9,8 +9,15 @@
 #include "imgui_impl_dx11.h"
 #include "imgui_impl_win32.h"
 #include "OBJ_Loader.h"
+#include "Camera.h"
 
 const int WIDTH = 1280, HEIGHT = 720;
+
+struct Vertex
+{
+	float x, y, z;
+	float r, g, b, a;
+};
 
 struct cBuffer
 {
@@ -19,7 +26,7 @@ struct cBuffer
 	float rx, ry, rz, rw;
 };
 
-bool spinning = false;
+bool spinning = true;
 
 void App::run()
 {
@@ -45,7 +52,7 @@ void App::run()
 
 	shader.LoadFromFile("src/VertexShader.hlsl", "src/PixelShader.hlsl");
 
-	vertexBuffer.createLayout(shader);
+	vertexBuffer.createLayout(shader, sizeof(float) * 7);
 
 	objl::Loader loader;
 	loader.LoadFile("monkey.obj");
@@ -85,30 +92,19 @@ void App::run()
 
 	bool invert = false;
 
-	DirectX::XMMATRIX WVP;
-	DirectX::XMMATRIX World;
-	DirectX::XMMATRIX camView;
-	DirectX::XMMATRIX camProjection;
+	Camera &camera = camera.getInstance();
 
-	DirectX::XMVECTOR camPosition;
-	DirectX::XMVECTOR camTarget;
-	DirectX::XMVECTOR camUp;
+	float fov = 120.0f;
 
-	camPosition = DirectX::XMVectorSet(0.0f, 0.0f, -0.5f, 0.0f);
-	camTarget = DirectX::XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
-	camUp = DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+	camera.setCamera(DirectX::XMVectorSet(0.0f, 0.0f, -0.5f, 0.0f), DirectX::XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f), DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f));
 
-	camView = DirectX::XMMatrixLookAtLH(camPosition, camTarget, camUp);
+	camera.setProjection(fov, (float)window.getRes()[0] / (float)window.getRes()[1], 0.01f, 1000.0f);
 
-	camProjection = DirectX::XMMatrixPerspectiveFovLH(DirectX::XMConvertToRadians(120.0f), (float)window.getRes()[0] / (float)window.getRes()[1], 0.01f, 1000.0f);
+	cBuffer cb = {camera.getWVP(), 0.0f, 0.0f, 2.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
 
-	World = DirectX::XMMatrixIdentity();
+	std::string fileName;
+	fileName.resize(255);
 
-	WVP = World * camView * camProjection;
-
-	cBuffer cb = {WVP, 0.0f, 0.0f, 2.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
-
-	cb.wvp = DirectX::XMMatrixTranspose(WVP);
 	while (running)
 	{
 		ImGuiIO &io = ImGui::GetIO();
@@ -118,10 +114,22 @@ void App::run()
 		ImGui::NewFrame();
 
 		ImGui::Begin("DX Playground");
+		ImGui::SliderFloat("FOV", &fov, 10.0f, 180.0f);
 		ImGui::InputFloat3("Mesh Position", &cb.x);
 		ImGui::InputFloat3("Mesh Rotation", &cb.rx);
 		ImGui::Checkbox("Spinning", &spinning);
+		ImGui::InputText("Model File", &fileName[0], fileName.size());
+
+		if (ImGui::Button("Load Model"))
+		{
+			fileName = "";
+			fileName.resize(255);
+		}
 		ImGui::End();
+
+		camera.setProjection(fov, (float)window.getRes()[0] / (float)window.getRes()[1], 0.01f, 1000.0f);
+
+		cb.wvp = camera.getWVP();
 
 		if (spinning)
 		{

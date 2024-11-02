@@ -3,10 +3,11 @@
 
 void Triangle::init()
 {
-
+    /*
     shader.LoadFromFile("VertexShader.hlsl", "PixelShader.hlsl");
 
     vertexBuffer.createLayout(shader);
+
 
     Vertex vertices[] = {
         {0.0f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f},   // Top (Red)
@@ -15,6 +16,7 @@ void Triangle::init()
     };
 
     vertexBuffer.createBuffer(vertices, sizeof(vertices));
+    */
 }
 
 void Triangle::draw()
