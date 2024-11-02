@@ -1,5 +1,6 @@
 #include "Renderer.h"
 #include "common.h"
+#include "Camera.h"
 namespace DXShit
 {
 	IDXGISwapChain *swapChain;
@@ -76,11 +77,10 @@ void Renderer::release()
 
 void Renderer::update()
 {
-
+	Camera &camera = Camera::getInstance();
 	swapChain->Present(1, 0);
 
-	float bgColor[] = {0.0f, 0.0f, 0.0f, 1.0f};
-	context->ClearRenderTargetView(renderTargetView, bgColor);
+	context->ClearRenderTargetView(renderTargetView, camera.color);
 	DXShit::context->ClearDepthStencilView(depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 }
 

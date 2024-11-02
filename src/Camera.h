@@ -25,6 +25,7 @@ public:
         static Camera instance;
         return instance;
     }
+    float color[4] = {0.0f, 0.0f, 0.0f, 0.0f};
 
     Camera(const Camera &) = delete;
     Camera &operator=(const Camera &) = delete;

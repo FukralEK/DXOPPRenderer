@@ -62,6 +62,7 @@ void App::run()
 
 		ImGui::Begin("DX Playground");
 		ImGui::SliderFloat("FOV", &fov, 10.0f, 180.0f);
+		ImGui::SliderFloat3("Background Color", camera.color, 0.0f, 1.0f);
 
 		if (meshes.size() != 0)
 		{
