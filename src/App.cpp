@@ -10,11 +10,14 @@
 #include "imgui_impl_win32.h"
 #include "Camera.h"
 #include "Mesh.h"
+#include <vector>
 
 const int WIDTH = 1280,
 		  HEIGHT = 720;
 
 bool spinning = true;
+
+std::vector<Mesh> meshes;
 
 void App::run()
 {
@@ -47,10 +50,7 @@ void App::run()
 	char buffer[255];
 	buffer[0] = '\0';
 
-	Mesh mesh;
-
-	mesh.position = {0.0f, 0.0f, 1.0f};
-	mesh.rotation = {0.0f, 0.0f, 0.0f};
+	int select = 0;
 
 	while (running)
 	{
@@ -62,18 +62,26 @@ void App::run()
 
 		ImGui::Begin("DX Playground");
 		ImGui::SliderFloat("FOV", &fov, 10.0f, 180.0f);
-		ImGui::InputFloat3("Mesh Position", &mesh.position.x);
-		ImGui::InputFloat3("Mesh Rotation", &mesh.rotation.x);
-		ImGui::Checkbox("Spinning", &spinning);
+
+		if (meshes.size() != 0)
+		{
+			ImGui::SliderInt("Mesh index", &select, 0, meshes.size() - 1);
+			ImGui::InputFloat3("Mesh Position", &meshes[select].position.x);
+			ImGui::InputFloat3("Mesh Rotation", &meshes[select].rotation.x);
+			ImGui::Checkbox("Spinning", &spinning);
+		}
+
 		ImGui::InputText("Model File", buffer, 255);
 
 		if (ImGui::Button("Load Model") && buffer[0] != '\0')
 		{
-			if (mesh.isLoaded())
-			{
-				mesh.release();
-			}
-			mesh.init(buffer);
+			meshes.push_back(Mesh());
+
+			meshes[meshes.size() - 1].init(buffer);
+
+			meshes[meshes.size() - 1].position = {0.0f, 0.0f, 2.0f};
+			meshes[meshes.size() - 1].rotation = {0.0f, 0.0f, 0.0f};
+
 			buffer[0] = '\0';
 		}
 		ImGui::End();
@@ -82,19 +90,25 @@ void App::run()
 
 		ImGui::Render();
 
-		if (spinning)
+		for (auto &mesh : meshes)
 		{
-			mesh.rotation.y += 0.05;
+			mesh.draw();
 		}
 
-		mesh.draw();
+		if (spinning)
+		{
+			for (auto &mesh : meshes)
+			{
+				mesh.rotation.y += 0.05f;
+			}
+		}
 
 		window.update(running);
 		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 		renderer.update();
 	}
 
-	if (mesh.isLoaded())
+	for (auto &mesh : meshes)
 	{
 		mesh.release();
 	}
