@@ -44,8 +44,8 @@ void App::run()
 
 	camera.setProjection(fov, (float)window.getRes()[0] / (float)window.getRes()[1], 0.01f, 1000.0f);
 
-	std::string fileName;
-	fileName.resize(255);
+	char buffer[255];
+	buffer[0] = '\0';
 
 	Mesh mesh;
 
@@ -65,17 +65,16 @@ void App::run()
 		ImGui::InputFloat3("Mesh Position", &mesh.position.x);
 		ImGui::InputFloat3("Mesh Rotation", &mesh.rotation.x);
 		ImGui::Checkbox("Spinning", &spinning);
-		ImGui::InputText("Model File", &fileName[0], fileName.size());
+		ImGui::InputText("Model File", buffer, 255);
 
-		if (ImGui::Button("Load Model") && fileName != "")
+		if (ImGui::Button("Load Model") && buffer[0] != '\0')
 		{
 			if (mesh.isLoaded())
 			{
 				mesh.release();
 			}
-			mesh.init(fileName);
-			fileName = "";
-			fileName.resize(255);
+			mesh.init(buffer);
+			buffer[0] = '\0';
 		}
 		ImGui::End();
 
