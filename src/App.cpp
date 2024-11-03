@@ -11,6 +11,7 @@
 #include "Camera.h"
 #include "Mesh.h"
 #include <vector>
+#include "Texture.h"
 
 const int WIDTH = 1280,
 		  HEIGHT = 720;
@@ -18,6 +19,8 @@ const int WIDTH = 1280,
 bool spinning = true;
 
 std::vector<Mesh> meshes;
+
+Vec3 cameraPosition = {0.0f, 0.0f, 0.0f};
 
 void App::run()
 {
@@ -43,7 +46,7 @@ void App::run()
 
 	float fov = 120.0f;
 
-	camera.setCamera(DirectX::XMVectorSet(0.0f, 0.0f, -0.5f, 0.0f), DirectX::XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f), DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f));
+	camera.setCamera(DirectX::XMVectorSet(cameraPosition.x, cameraPosition.y, cameraPosition.z, 0.0f), DirectX::XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f), DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f));
 
 	camera.setProjection(fov, (float)window.getRes()[0] / (float)window.getRes()[1], 0.01f, 1000.0f);
 
@@ -52,6 +55,10 @@ void App::run()
 
 	int select = 0;
 
+	Texture texture;
+
+	texture.init("texture.png");
+
 	while (running)
 	{
 		ImGuiIO &io = ImGui::GetIO();
@@ -59,9 +66,11 @@ void App::run()
 		ImGui_ImplDX11_NewFrame();
 		ImGui_ImplWin32_NewFrame();
 		ImGui::NewFrame();
-
+		ImGui::Begin("Camera");
+		ImGui::InputFloat3("Camera Position", &cameraPosition.x);
+		ImGui::End();
 		ImGui::Begin("DX Playground");
-		ImGui::Text("Faces: %d", camera.faces);
+		ImGui::Text("Triangles: %d Meshes: %d Draw Calls: %d", camera.faces, meshes.size(), camera.drawCalls);
 		ImGui::SliderFloat("FOV", &fov, 10.0f, 180.0f);
 		ImGui::SliderFloat3("Background Color", camera.color, 0.0f, 1.0f);
 
@@ -89,10 +98,13 @@ void App::run()
 		ImGui::End();
 
 		camera.setProjection(fov, (float)window.getRes()[0] / (float)window.getRes()[1], 0.01f, 1000.0f);
+		camera.setCamera(DirectX::XMVectorSet(cameraPosition.x, cameraPosition.y, cameraPosition.z, 0.0f), DirectX::XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f), DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f));
 
 		ImGui::Render();
 
+		texture.use();
 		camera.faces = 0;
+		camera.drawCalls = 0;
 		for (auto &mesh : meshes)
 		{
 			mesh.draw();
@@ -115,6 +127,8 @@ void App::run()
 	{
 		mesh.release();
 	}
+
+	texture.release();
 
 	ImGui_ImplDX11_Shutdown();
 	ImGui_ImplWin32_Shutdown();

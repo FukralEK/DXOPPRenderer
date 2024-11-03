@@ -21,6 +21,7 @@ private:
 
 public:
     int faces = 0;
+    int drawCalls = 0;
 
     static Camera &getInstance()
     {

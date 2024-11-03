@@ -3,6 +3,8 @@
 #include "App.h"
 #include "common.h"
 #include <stdio.h>
+#define STB_IMAGE_IMPLEMENTATION
+#include "std_image.h"
 
 App app;
 

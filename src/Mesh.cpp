@@ -26,16 +26,34 @@ void Mesh::init(std::string file)
 
     Vertex *verticies = new Vertex[verticiesObj.size()];
 
-    float r = 0.0f;
+    float r = 1.0f;
     float g = 1.0f;
-    float b = 0.0f;
+
+    int index = 0;
 
     for (int i = 0; i < verticiesObj.size(); i++)
     {
-        r = g;
-        g = b;
-        b = r;
-        verticies[i] = {verticiesObj[i].Position.X, verticiesObj[i].Position.Y, verticiesObj[i].Position.Z, r, g, b, 1.0f};
+
+        switch (index)
+        {
+        case 0:
+            r = 1.0f;
+            g = 1.0f;
+            index = 1;
+            break;
+        case 1:
+            r = 0.0f;
+            g = 1.0f;
+            index = 2;
+            break;
+        case 2:
+            r = 1.0f;
+            g = 0.0f;
+            index = 0;
+            break;
+        }
+
+        verticies[i] = {verticiesObj[i].Position.X, verticiesObj[i].Position.Y, verticiesObj[i].Position.Z, r, g, 0.0f, 1.0f};
     }
 
     auto indicesObj = loader.LoadedIndices;
@@ -87,6 +105,7 @@ void Mesh::draw()
     constantBuffer.update(&cb, sizeof(cb));
 
     DXShit::context->DrawIndexed(indexBuffer.getCount(), 0, 0);
+    camera.drawCalls++;
 
     camera.faces += indexBuffer.getCount() / 3;
 }
